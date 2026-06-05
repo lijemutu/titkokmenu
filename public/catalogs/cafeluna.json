@@ -1,0 +1,35 @@
+{
+  "shopName": "Café Luna",
+  "shopSlug": "cafeluna",
+  "whatsappNumber": "527229876543",
+  "welcomeMessage": "¡Hola! Bienvenidos a Café Luna. Échale un ojito a nuestro menú de cafés de especialidad y repostería artesanal.",
+  "whatsappTemplate": "¡Hola! Me gustaría ordenar {itemName} (precio: ${price}) para llevar. ¿Me pueden confirmar el tiempo de preparación?",
+  "theme": {
+    "primaryColor": "#6f4e37",
+    "accentColor": "#fedcba",
+    "textColor": "#ffffff"
+  },
+  "items": [
+    {
+      "id": "1",
+      "name": "Café Latte Especial",
+      "price": 55,
+      "description": "Espresso doble con leche vaporizada a la perfección y un toque sutil de jarabe de vainilla de Papantla hecho en casa.",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "2",
+      "name": "Croissant de Almendras",
+      "price": 45,
+      "description": "Croissant hojaldrado artesanal relleno de crema de almendras y decorado con almendras fileteadas tostadas.",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "3",
+      "name": "Afogato de Espresso",
+      "price": 60,
+      "description": "Una bola de helado de vainilla premium 'ahogada' con un shot caliente de nuestro espresso de especialidad recién extraído.",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    }
+  ]
+}
