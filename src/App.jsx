@@ -79,16 +79,17 @@ function App() {
   // Render Loading Screen
   if (loading) {
     return (
-      <div className="error-container" style={{ gap: '1rem' }}>
-        <div className="logo-dot" style={{ 
-          width: '40px', 
-          height: '40px', 
-          backgroundColor: '#ff3366', 
-          animation: 'pulse-cta 1.5s infinite',
-          boxShadow: '0 0 20px #ff3366'
-        }}></div>
-        <h2 className="error-title" style={{ fontSize: '1.5rem', fontWeight: 600 }}>Cargando catálogo...</h2>
-        <p className="error-desc">Espere un momento, por favor.</p>
+      <div className="ojitos-loading-screen">
+        <div className="ojitos-loader">
+          <div className="ojito-capsule">
+            <div className="ojito-pupil"></div>
+          </div>
+          <div className="ojito-capsule">
+            <div className="ojito-pupil"></div>
+          </div>
+        </div>
+        <h2 className="loading-title">Cargando catálogo...</h2>
+        <p className="loading-desc">Échale un ojito a lo que viene.</p>
       </div>
     );
   }
@@ -96,8 +97,8 @@ function App() {
   // Render Error Screen
   if (error) {
     return (
-      <div className="error-container">
-        <div style={{ fontSize: '4rem' }}>⚠️</div>
+      <div className="ojitos-error-screen">
+        <div className="ojitos-error-icon">⚠️</div>
         <h2 className="error-title">Catálogo No Encontrado</h2>
         <p className="error-desc">{error}</p>
         <button className="error-btn" onClick={() => handleNavigate(null)}>
