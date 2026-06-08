@@ -81,32 +81,7 @@ export default function LandingPage({ onNavigate }) {
         <p className="section-subtitle">Elige un comercio local y vive la experiencia móvil real</p>
         
         <div className="demo-cards-container">
-          {/* Card 1: Cafe Luna */}
-          <div 
-            className="demo-card cafe" 
-            onClick={() => onNavigate('cafeluna')}
-          >
-            <div className="card-icon">☕</div>
-            <h3 className="card-title">Café Luna</h3>
-            <p className="card-desc">
-              Cafetería local. Antójate con videos cortos de latte art, croissants recién horneados y repostería artesanal.
-            </p>
-            <button className="card-btn">Ver Menú</button>
-          </div>
-
-          {/* Card 2: Calzados Luna */}
-          <div 
-            className="demo-card shoes" 
-            onClick={() => onNavigate('calzadosluna')}
-          >
-            <div className="card-icon">👟</div>
-            <h3 className="card-title">Calzados Luna</h3>
-            <p className="card-desc">
-              Zapatería artesanal de San Mateo Atenco. Explora botas Chelsea, zapatillas y tenis de piel en video vertical.
-            </p>
-            <button className="card-btn">Ver Catálogo</button>
-          </div>
-
+        
           {/* Card 3: Underprice */}
           <div 
             className="demo-card underprice" 
@@ -140,11 +115,6 @@ export default function LandingPage({ onNavigate }) {
             <div className="step-num">3</div>
             <h3 className="step-title">Pega tu Código QR</h3>
             <p className="step-desc">Coloca el código QR en mesas, mostradores o empaques. Escanear abre el catálogo de inmediato.</p>
-          </div>
-          <div className="step-item">
-            <div className="step-num">4</div>
-            <h3 className="step-title">Vende por WhatsApp</h3>
-            <p className="step-desc">El cliente elige, pulsa el botón y te llega un mensaje directo con el producto y precio exacto.</p>
           </div>
         </div>
       </section>
