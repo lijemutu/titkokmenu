@@ -1,0 +1,17 @@
+¡Hola, Susi! 👋 Espero que todo vaya chido con tu pastelería.
+
+Te escribo rápido porque acabo de lanzar ojito, una plataforma pensada para que negocios locales muestren sus productos en formato de videos cortos tipo TikTok. La idea es que puedas generar un código QR para tu local o tus redes, y cuando la gente lo escanee, vea en un segundo cómo luce tu producto en la vida real. 📱✨
+
+Armé un demo rápido con una tienda de ropa deportiva para que veas exactamente cómo funciona la experiencia: https://ojito-mvp.vercel.app/?s=underprice
+
+Como voy arrancando, estoy buscando los primeros negocios para que la prueben gratis y me den su opinión. ¿Te late que hagamos la prueba con tus productos? Avísame y lo platicamos. ¡Un abrazo!
+
+
+
+¡Hola! 👋 Les cuento rápido en qué ando metido: acabo de lanzar ojito, una plataforma para que pequeños comercios (tiendas de ropa, bazares, cafés, estéticas, etc.) tengan su catálogo digital en videos cortos tipo TikTok, accesible directo con un código QR en su local. 📱🔥
+
+Monté un sitio demo con ropa deportiva para que veas cómo se interactúa con el catálogo: https://ojito-mvp.vercel.app/?s=underprice
+
+Te quería pedir un enorme favor: ¿conoces a alguien que tenga un negocio o venda productos y creas que le pueda servir para modernizarse y vender más?
+
+Si me echas la mano pasándome su contacto o compartiéndole este mensajito, me harías un parote. ¡Muchas gracias de antemano! 🙌

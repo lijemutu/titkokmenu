@@ -62,24 +62,24 @@ Los catálogos están en la carpeta `public/catalogs/` y siguen el siguiente esq
 
 ---
 
-## 📹 Compresión y Optimización de Video (FFmpeg + GPU)
+## 📹 Segmentación y Streaming de Video HLS (TikTok-Style)
 
-Los celulares modernos graban videos muy pesados. El script `compress_videos.js` automatiza la conversión a formato vertical, escala a `720x1280` y comprime el peso a menos de `1.5 MB`.
+Los celulares modernos graban videos muy pesados. Para evitar la pérdida de calidad al comprimirlos y lograr una reproducción instantánea (estilo TikTok), el script `chunk_videos.js` segmenta los videos en fragmentos HLS de 2 segundos.
 
-> [!NOTE]
-> Este script detecta automáticamente si tu máquina tiene una **tarjeta gráfica AMD** en Linux (`VAAPI`) y la utiliza para codificación por hardware ultra-rápida. Si no está configurada, utiliza la CPU (`libx264`) de forma segura como respaldo.
+> [!TIP]
+> Al reproducir videos segmentados, el navegador solo descarga el primer fragmento de 2 segundos para iniciar la reproducción inmediatamente. Si el usuario pasa de largo el video rápido, se ahorra una gran cantidad de datos y ancho de banda. Además, el script utiliza codificación de CPU de alta definición (`-crf 20`) para mantener la calidad visual idéntica a la original.
 
 ### Instrucciones de uso:
 1. Instala FFmpeg en tu sistema:
    ```bash
    sudo apt update && sudo apt install -y ffmpeg
    ```
-2. Crea una carpeta llamada `raw_videos` en la raíz del proyecto y copia tus videos pesados ahí.
-3. Ejecuta el optimizador:
+2. Crea una carpeta llamada `raw_videos` en la raíz del proyecto y copia tus videos pesados ahí. (Si no existe, el script también puede procesar archivos directamente en `public/videos/` como respaldo).
+3. Ejecuta el segmentador:
    ```bash
-   node scripts/compress_videos.js
+   node scripts/chunk_videos.js
    ```
-4. Los videos optimizados con nombres listos para la web se guardarán automáticamente en `public/videos/`.
+4. Los videos se procesarán, se guardará el playlist `index.m3u8` y los fragmentos `.ts` en `public/videos/<nombre-video>/`, y las referencias en los catálogos en `public/catalogs/` se actualizarán automáticamente.
 
 ---
 
@@ -122,10 +122,10 @@ Copia y pega estos comandos directamente en tu consola según lo que necesites h
     npm run dev -- --host
     ```
 
-### 🎬 Optimizar y Comprimir Videos
-*   **Procesar carpeta `/raw_videos/`**:
+### 🎬 Segmentar Videos en Formato HLS
+*   **Procesar carpeta `/raw_videos/` (o respaldo de `/public/videos/`)**:
     ```bash
-    node scripts/compress_videos.js
+    node scripts/chunk_videos.js
     ```
 
 ### 🖨️ Generar Códigos QR (Modo Rápido / No Interactivo)

@@ -15,6 +15,7 @@ export default function VideoItem({
   const containerRef = useRef(null);
   const clickTimeoutRef = useRef(null);
   const lastClickTimeRef = useRef(0);
+  const hlsRef = useRef(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
@@ -45,29 +46,117 @@ export default function VideoItem({
     };
   }, []);
 
-  // Control video play/pause state based on intersection
+  // Handle video source initialization and hls.js binding
   useEffect(() => {
-    if (!videoRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
 
-    if (isIntersecting) {
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.log("Autoplay was prevented:", error);
-            setIsPlaying(false);
-          });
+    // Clean up previous HLS instance if any
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    const isHls = item.videoUrl.endsWith('.m3u8');
+
+    if (isHls) {
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS support (Safari/iOS)
+        video.src = item.videoUrl;
+      } else {
+        // Fallback to hls.js (Chrome/Firefox/Android)
+        import('hls.js').then((HlsModule) => {
+          const Hls = HlsModule.default;
+          if (Hls.isSupported()) {
+            const hls = new Hls({
+              maxMaxBufferLength: 10, // Max buffer size in seconds
+              enableWorker: true,
+              lowLatencyMode: true,
+            });
+            hlsRef.current = hls;
+            hls.loadSource(item.videoUrl);
+            hls.attachMedia(video);
+
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              if (isIntersecting) {
+                video.play()
+                  .then(() => setIsPlaying(true))
+                  .catch((err) => console.log('Autoplay play error:', err));
+              }
+            });
+
+            hls.on(Hls.Events.ERROR, (event, data) => {
+              if (data.fatal) {
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    console.warn('HLS Network error, trying to recover...', data);
+                    hls.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                    console.warn('HLS Media error, trying to recover...', data);
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    console.error('Fatal HLS error, destroying...', data);
+                    hls.destroy();
+                    hlsRef.current = null;
+                    break;
+                }
+              }
+            });
+          } else {
+            console.error('HLS is not supported in this browser.');
+          }
+        });
       }
     } else {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+      // Normal MP4 video
+      video.src = item.videoUrl;
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [item.videoUrl]);
+
+  // Control video play/pause state based on intersection
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isIntersecting) {
+      const isHls = item.videoUrl.endsWith('.m3u8');
+      const isNativeHls = video.canPlayType('application/vnd.apple.mpegurl');
+      
+      // If we are using hls.js, play is triggered on MANIFEST_PARSED when it loads.
+      // If it's already loaded/attached or if it's native/MP4, we can play immediately.
+      if (!isHls || isNativeHls || (hlsRef.current && hlsRef.current.media)) {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+            })
+            .catch((error) => {
+              console.log("Autoplay was prevented:", error);
+              setIsPlaying(false);
+            });
+        }
+      }
+    } else {
+      video.pause();
+      try {
+        video.currentTime = 0;
+      } catch (e) {
+        // Suppress seeking errors before video metadata loads
+      }
       setIsPlaying(false);
       setProgress(0);
     }
-  }, [isIntersecting]);
+  }, [isIntersecting, item.videoUrl]);
 
   // Update progress bar
   const handleTimeUpdate = () => {
@@ -191,7 +280,6 @@ export default function VideoItem({
         {/* HTML5 Video Player */}
         <video
           ref={videoRef}
-          src={item.videoUrl}
           loop
           muted={isMuted}
           playsInline
