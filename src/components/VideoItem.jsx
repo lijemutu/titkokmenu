@@ -20,6 +20,7 @@ export default function VideoItem({
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showPlayIndicator, setShowPlayIndicator] = useState(false);
   const [indicatorType, setIndicatorType] = useState('play'); // 'play' or 'pause'
@@ -27,23 +28,41 @@ export default function VideoItem({
   const [shared, setShared] = useState(false);
   const [hearts, setHearts] = useState([]); // Array to store active popping hearts
 
-  // Set up Intersection Observer to handle autoplay
+  // Set up Intersection Observers to handle autoplay and preloading
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    // 1. Play Observer: Triggers playback when 60% of the video container is visible
+    const playObserver = new IntersectionObserver(
       ([entry]) => {
         setIsIntersecting(entry.isIntersecting);
       },
       {
-        threshold: 0.6 // Trigger when 60% of the video container is visible
+        threshold: 0.6
+      }
+    );
+
+    // 2. Preload Observer: Preloads video resources when within 1 viewport height above/below the screen
+    const preloadObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+        } else {
+          setShouldLoad(false);
+        }
+      },
+      {
+        rootMargin: '100% 0px 100% 0px', // Preloads next and caches previous video
+        threshold: 0.01
       }
     );
 
     if (containerRef.current) {
-      observer.observe(containerRef.current);
+      playObserver.observe(containerRef.current);
+      preloadObserver.observe(containerRef.current);
     }
 
     return () => {
-      observer.disconnect();
+      playObserver.disconnect();
+      preloadObserver.disconnect();
     };
   }, []);
 
@@ -52,7 +71,17 @@ export default function VideoItem({
     const video = videoRef.current;
     if (!video) return;
 
-    // Clean up previous HLS instance if any
+    if (!shouldLoad) {
+      // Clean up HLS and source if video moves out of preload range to free memory and bandwidth
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      video.src = '';
+      return;
+    }
+
+    // Clean up previous HLS instance if any before starting new one
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
@@ -121,12 +150,12 @@ export default function VideoItem({
         hlsRef.current = null;
       }
     };
-  }, [item.videoUrl]);
+  }, [item.videoUrl, shouldLoad]);
 
   // Control video play/pause state based on intersection
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !shouldLoad) return;
 
     if (isIntersecting) {
       const isHls = item.videoUrl.endsWith('.m3u8');
@@ -157,7 +186,7 @@ export default function VideoItem({
       setIsPlaying(false);
       setProgress(0);
     }
-  }, [isIntersecting, item.videoUrl]);
+  }, [isIntersecting, item.videoUrl, shouldLoad]);
 
   // Update progress bar
   const handleTimeUpdate = () => {

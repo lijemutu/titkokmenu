@@ -2,7 +2,6 @@
   "shopName": "Underprice",
   "shopSlug": "underprice",
   "whatsappNumber": "",
-  "welcomeMessage": "¡Bienvenidos a Underprice! Échale un ojito a nuestras ofertas y productos exclusivos.",
   "whatsappTemplate": "¡Hola! Estoy interesado en {itemName} (precio: ${price}). ¿Tienen disponibles?",
   "socialUrl": "https://www.instagram.com/underprice.toluca/",
   "theme": {

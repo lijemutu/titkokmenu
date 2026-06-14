@@ -8,7 +8,6 @@ Usa esta lista como guía rápida para recopilar la información técnica, visua
 * [ ] **Nombre del Negocio (`shopName`):** Nombre comercial exacto que aparecerá en el encabezado.
 * [ ] **Slug de la URL (`shopSlug`):** Identificador único en minúsculas, sin espacios ni caracteres especiales (ej. `miche-luna`, `cafeluna`).
 * [ ] **WhatsApp de Ventas (`whatsappNumber`):** Número de teléfono con código de país, sin espacios ni símbolos (ej. `527221234567`).
-* [ ] **Mensaje de Bienvenida (`welcomeMessage`):** Texto de bienvenida o subtítulo debajo del nombre de la tienda.
 * [ ] **Plantilla de Mensaje de WhatsApp (`whatsappTemplate`):** Texto automático que se enviará al hacer clic en un producto.
   * *Por defecto:* `¡Hola! Me interesa ordenar {itemName} (precio: ${price}) desde el menú digital.`
 

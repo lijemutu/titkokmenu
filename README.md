@@ -39,7 +39,6 @@ Los catálogos están en la carpeta `public/catalogs/` y siguen el siguiente esq
   "shopName": "Nombre de la Tienda",
   "shopSlug": "nombretienda",
   "whatsappNumber": "527221234567",
-  "welcomeMessage": "Mensaje de bienvenida al escanear.",
   "whatsappTemplate": "¡Hola! Estoy interesado en {itemName} (precio: ${price}).",
   "theme": {
     "primaryColor": "#c084fc",
