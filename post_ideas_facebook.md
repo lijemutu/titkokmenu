@@ -92,16 +92,16 @@ Por eso estoy armando un experimento: cambiar menús tradicionales por catálogo
    * **Paso A: Responder públicamente al comentario (Muy importante para el algoritmo):**
      Al responder públicamente, notificas al usuario, aumentas el conteo de comentarios del post (lo que hace que Facebook lo muestre a más personas) y demuestras que estás activo.
      * *Copy sugerido para responder al comentario:*
-       > *"¡Hola Mauricio! Claro que sí, ya te envié el demo y todos los detalles de la prueba piloto gratuita por mensaje privado. ¡Dale una mirada a tu bandeja de entrada o a tu carpeta de solicitudes de mensaje! 📥"*
+       > *"¡Hola Luz! Claro que sí, ya te envié el demo y todos los detalles de la prueba piloto gratuita por mensaje privado. ¡Dale una mirada a tu bandeja de entrada o a tu carpeta de solicitudes de mensaje! 📥"*
    * **Paso B: Enviar Mensaje Privado (DM) inmediatamente:**
      Dado que no son amigos, el mensaje caerá en su carpeta de "Solicitudes de Mensaje". Envía un mensaje directo, amigable y que cierre con una pregunta simple para iniciar la conversación.
      * *Copy sugerido para el DM:*
-       > *"¡Hola Mauricio! Qué gusto saludarte. Vi tu comentario en el grupo de restauranteros.
+       > *"¡Hola Luz! Qué gusto saludarte. Vi tu comentario en el grupo de restauranteros.
        > 
        > Te comparto el enlace del demo funcional para que veas en tu celular cómo funciona el menú interactivo en video vertical (estilo TikTok):
        👉 https://ojito-mvp.vercel.app/?s=underprice
        > 
-       > Como comenté en el post, estoy haciendo una prueba piloto local 100% gratuita en Toluca y Metepec a cambio de tu feedback para mejorar la herramienta. 
+       > Como comenté en el post, estoy haciendo una prueba piloto local 100% gratuita en Toluca y Metepec a cambio de tu opinión para mejorar la herramienta. 
        > 
        > Para ver cómo podemos adaptarlo mejor a tu local, ¿qué especialidad de comida o bebidas vendes en tu negocio?
 

@@ -23,6 +23,7 @@ export default function VideoFeed({ catalog, onBack }) {
           onToggleMute={handleToggleMute}
           onBack={onBack}
           shopName={catalog.shopName}
+          socialUrl={catalog.socialUrl}
         />
       ))}
     </div>

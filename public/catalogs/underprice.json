@@ -1,9 +1,10 @@
 {
   "shopName": "Underprice",
   "shopSlug": "underprice",
-  "whatsappNumber": "527221234567",
+  "whatsappNumber": "",
   "welcomeMessage": "¡Bienvenidos a Underprice! Échale un ojito a nuestras ofertas y productos exclusivos.",
   "whatsappTemplate": "¡Hola! Estoy interesado en {itemName} (precio: ${price}). ¿Tienen disponibles?",
+  "socialUrl": "https://www.instagram.com/underprice.toluca/",
   "theme": {
     "primaryColor": "#ff0080",
     "accentColor": "#7928ca",

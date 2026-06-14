@@ -9,7 +9,8 @@ export default function VideoItem({
   isMuted, 
   onToggleMute, 
   onBack, 
-  shopName 
+  shopName,
+  socialUrl
 }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -236,6 +237,7 @@ export default function VideoItem({
 
   // WhatsApp link compilation
   const handleCtaClick = () => {
+    if (!whatsappNumber) return;
     let text = whatsappTemplate || "¡Hola! Me interesa {itemName} por ${price}.";
     text = text.replace('{itemName}', item.name).replace('{price}', item.price);
     
@@ -326,10 +328,24 @@ export default function VideoItem({
             </svg>
           </button>
           
-          <div className="shop-badge">
-            <span className="logo-dot" style={{ backgroundColor: '#25d366', boxShadow: '0 0 8px #25d366' }}></span>
-            <span className="shop-badge-text">{shopName}</span>
-          </div>
+          {socialUrl ? (
+            <a 
+              href={socialUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="shop-badge"
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="logo-dot" style={{ backgroundColor: '#25d366', boxShadow: '0 0 8px #25d366' }}></span>
+              <span className="shop-badge-text">{shopName}</span>
+            </a>
+          ) : (
+            <div className="shop-badge">
+              <span className="logo-dot" style={{ backgroundColor: '#25d366', boxShadow: '0 0 8px #25d366' }}></span>
+              <span className="shop-badge-text">{shopName}</span>
+            </div>
+          )}
 
           <div className="top-controls">
             <button className="sound-toggle-btn" onClick={onToggleMute} title={isMuted ? "Activar sonido" : "Silenciar"}>
@@ -404,12 +420,14 @@ export default function VideoItem({
           </div>
 
           {/* Action CTA Button */}
-          {/* <button className="cta-button" onClick={handleCtaClick}>
-            <svg className="cta-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.504-5.728-1.463L0 24zm6.59-4.846c1.666.988 3.311 1.485 5.353 1.486 5.517 0 10.005-4.487 10.008-10.005.002-2.673-1.04-5.186-2.933-7.078C17.133 1.664 14.62 0.62 11.997 0.62 6.478 0.62 1.99 5.108 1.987 10.628c-.001 2.107.552 4.162 1.602 5.922l-.992 3.619 3.705-.973zm12.39-8.125c-.29-.145-1.713-.846-1.978-.942-.266-.097-.459-.145-.653.145-.193.29-.748.942-.917 1.135-.169.193-.339.218-.63.073-.29-.145-1.223-.45-2.33-1.438-.861-.768-1.443-1.717-1.612-2.008-.169-.29-.018-.447.127-.591.13-.13.29-.339.435-.508.145-.169.193-.29.29-.484.097-.193.048-.363-.024-.508-.073-.145-.653-1.573-.895-2.153-.235-.567-.474-.49-.653-.498-.168-.008-.363-.01-.557-.01-.193 0-.508.072-.773.362-.266.29-1.015.99-1.015 2.416 0 1.426 1.039 2.804 1.184 2.998.145.193 2.046 3.125 4.957 4.38.692.298 1.233.477 1.654.61.696.22 1.329.19 1.83.115.558-.085 1.713-.7 1.954-1.377.242-.678.242-1.258.17-1.377-.073-.118-.266-.19-.558-.335z" />
-            </svg>
-            Preguntar por WhatsApp
-          </button> */}
+          {whatsappNumber && (
+            <button className="cta-button" onClick={handleCtaClick}>
+              <svg className="cta-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.504-5.728-1.463L0 24zm6.59-4.846c1.666.988 3.311 1.485 5.353 1.486 5.517 0 10.005-4.487 10.008-10.005.002-2.673-1.04-5.186-2.933-7.078C17.133 1.664 14.62 0.62 11.997 0.62 6.478 0.62 1.99 5.108 1.987 10.628c-.001 2.107.552 4.162 1.602 5.922l-.992 3.619 3.705-.973zm12.39-8.125c-.29-.145-1.713-.846-1.978-.942-.266-.097-.459-.145-.653.145-.193.29-.748.942-.917 1.135-.169.193-.339.218-.63.073-.29-.145-1.223-.45-2.33-1.438-.861-.768-1.443-1.717-1.612-2.008-.169-.29-.018-.447.127-.591.13-.13.29-.339.435-.508.145-.169.193-.29.29-.484.097-.193.048-.363-.024-.508-.073-.145-.653-1.573-.895-2.153-.235-.567-.474-.49-.653-.498-.168-.008-.363-.01-.557-.01-.193 0-.508.072-.773.362-.266.29-1.015.99-1.015 2.416 0 1.426 1.039 2.804 1.184 2.998.145.193 2.046 3.125 4.957 4.38.692.298 1.233.477 1.654.61.696.22 1.329.19 1.83.115.558-.085 1.713-.7 1.954-1.377.242-.678.242-1.258.17-1.377-.073-.118-.266-.19-.558-.335z" />
+              </svg>
+              Preguntar por WhatsApp
+            </button>
+          )}
         </div>
       </div>
     </div>
