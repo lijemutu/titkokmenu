@@ -10,7 +10,9 @@ export default function VideoItem({
   onToggleMute, 
   onBack, 
   shopName,
-  socialUrl
+  socialUrl,
+  activeIndex,
+  onActive
 }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -20,7 +22,6 @@ export default function VideoItem({
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
-  const [shouldLoad, setShouldLoad] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showPlayIndicator, setShowPlayIndicator] = useState(false);
   const [indicatorType, setIndicatorType] = useState('play'); // 'play' or 'pause'
@@ -28,51 +29,43 @@ export default function VideoItem({
   const [shared, setShared] = useState(false);
   const [hearts, setHearts] = useState([]); // Array to store active popping hearts
 
-  // Set up Intersection Observers to handle autoplay and preloading
+  // Compute loading states based on activeIndex passed from parent
+  const isCurrentlyActive = index === activeIndex;
+  const isWithinPreloadRange = Math.abs(index - activeIndex) <= 1;
+  const isWithinCacheRange = Math.abs(index - activeIndex) <= 2;
+
+  // Set up Intersection Observer to handle active play state callback to parent
   useEffect(() => {
-    // 1. Play Observer: Triggers playback when 60% of the video container is visible
     const playObserver = new IntersectionObserver(
       ([entry]) => {
         setIsIntersecting(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          onActive(index);
+        }
       },
       {
         threshold: 0.6
       }
     );
 
-    // 2. Preload Observer: Preloads video resources when within 1 viewport height above/below the screen
-    const preloadObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShouldLoad(true);
-        } else {
-          setShouldLoad(false);
-        }
-      },
-      {
-        rootMargin: '100% 0px 100% 0px', // Preloads next and caches previous video
-        threshold: 0.01
-      }
-    );
-
     if (containerRef.current) {
       playObserver.observe(containerRef.current);
-      preloadObserver.observe(containerRef.current);
     }
 
     return () => {
       playObserver.disconnect();
-      preloadObserver.disconnect();
     };
-  }, []);
+  }, [index, onActive]);
 
-  // Handle video source initialization and hls.js binding
+  // 1. Manage HLS/Video Source Initialization & Destruction (Cache Range)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (!shouldLoad) {
-      // Clean up HLS and source if video moves out of preload range to free memory and bandwidth
+    const isHls = item.videoUrl.endsWith('.m3u8');
+
+    if (!isWithinCacheRange) {
+      // Out of cache range: completely destroy HLS and clear source to free memory/decoder
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
@@ -81,83 +74,88 @@ export default function VideoItem({
       return;
     }
 
-    // Clean up previous HLS instance if any before starting new one
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
+    // Within cache range but HLS not initialized yet: initialize it
+    if (!video.src && !hlsRef.current) {
+      if (isHls) {
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          // Native HLS support (Safari/iOS)
+          video.src = item.videoUrl;
+        } else {
+          // Fallback to hls.js (Chrome/Firefox/Android)
+          import('hls.js').then((HlsModule) => {
+            const Hls = HlsModule.default;
+            if (Hls.isSupported()) {
+              const hls = new Hls({
+                maxMaxBufferLength: 10, // Max buffer size in seconds
+                enableWorker: true,
+                lowLatencyMode: true,
+              });
+              hlsRef.current = hls;
+              hls.loadSource(item.videoUrl);
+              hls.attachMedia(video);
 
-    const isHls = item.videoUrl.endsWith('.m3u8');
-
-    if (isHls) {
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Native HLS support (Safari/iOS)
-        video.src = item.videoUrl;
-      } else {
-        // Fallback to hls.js (Chrome/Firefox/Android)
-        import('hls.js').then((HlsModule) => {
-          const Hls = HlsModule.default;
-          if (Hls.isSupported()) {
-            const hls = new Hls({
-              maxMaxBufferLength: 10, // Max buffer size in seconds
-              enableWorker: true,
-              lowLatencyMode: true,
-            });
-            hlsRef.current = hls;
-            hls.loadSource(item.videoUrl);
-            hls.attachMedia(video);
-
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-              if (isIntersecting) {
-                video.play()
-                  .then(() => setIsPlaying(true))
-                  .catch((err) => console.log('Autoplay play error:', err));
-              }
-            });
-
-            hls.on(Hls.Events.ERROR, (event, data) => {
-              if (data.fatal) {
-                switch (data.type) {
-                  case Hls.ErrorTypes.NETWORK_ERROR:
-                    console.warn('HLS Network error, trying to recover...', data);
-                    hls.startLoad();
-                    break;
-                  case Hls.ErrorTypes.MEDIA_ERROR:
-                    console.warn('HLS Media error, trying to recover...', data);
-                    hls.recoverMediaError();
-                    break;
-                  default:
-                    console.error('Fatal HLS error, destroying...', data);
-                    hls.destroy();
-                    hlsRef.current = null;
-                    break;
+              hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                if (isCurrentlyActive) {
+                  video.play()
+                    .then(() => setIsPlaying(true))
+                    .catch((err) => console.log('Autoplay play error:', err));
                 }
-              }
-            });
-          } else {
-            console.error('HLS is not supported in this browser.');
-          }
-        });
+              });
+
+              hls.on(Hls.Events.ERROR, (event, data) => {
+                if (data.fatal) {
+                  switch (data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                      console.warn('HLS Network error, trying to recover...', data);
+                      hls.startLoad();
+                      break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                      console.warn('HLS Media error, trying to recover...', data);
+                      hls.recoverMediaError();
+                      break;
+                    default:
+                      console.error('Fatal HLS error, destroying...', data);
+                      hls.destroy();
+                      hlsRef.current = null;
+                      break;
+                  }
+                }
+              });
+            }
+          });
+        }
+      } else {
+        // Normal MP4 video
+        video.src = item.videoUrl;
       }
-    } else {
-      // Normal MP4 video
-      video.src = item.videoUrl;
     }
 
     return () => {
+      // On unmount
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
       }
     };
-  }, [item.videoUrl, shouldLoad]);
+  }, [item.videoUrl, isWithinCacheRange]);
 
-  // Control video play/pause state based on intersection
+  // 2. Control segment downloading (startLoad / stopLoad) based on Preload Range
+  useEffect(() => {
+    if (hlsRef.current) {
+      if (isWithinPreloadRange) {
+        hlsRef.current.startLoad();
+      } else {
+        hlsRef.current.stopLoad();
+      }
+    }
+  }, [isWithinPreloadRange]);
+
+  // 3. Control Video Playback (Play / Pause) based on active state
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !shouldLoad) return;
+    if (!video || !isWithinCacheRange) return;
 
-    if (isIntersecting) {
+    if (isCurrentlyActive) {
       const isHls = item.videoUrl.endsWith('.m3u8');
       const isNativeHls = video.canPlayType('application/vnd.apple.mpegurl');
       
@@ -186,7 +184,7 @@ export default function VideoItem({
       setIsPlaying(false);
       setProgress(0);
     }
-  }, [isIntersecting, item.videoUrl, shouldLoad]);
+  }, [isCurrentlyActive, isWithinCacheRange, item.videoUrl]);
 
   // Update progress bar
   const handleTimeUpdate = () => {

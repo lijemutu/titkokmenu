@@ -3,6 +3,7 @@ import VideoItem from './VideoItem';
 
 export default function VideoFeed({ catalog, onBack }) {
   const [isMuted, setIsMuted] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleToggleMute = (e) => {
     e.stopPropagation();
@@ -24,6 +25,8 @@ export default function VideoFeed({ catalog, onBack }) {
           onBack={onBack}
           shopName={catalog.shopName}
           socialUrl={catalog.socialUrl}
+          activeIndex={activeIndex}
+          onActive={setActiveIndex}
         />
       ))}
     </div>
