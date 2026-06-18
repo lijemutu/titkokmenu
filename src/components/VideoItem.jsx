@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import Hls from 'hls.js';
 
 export default function VideoItem({ 
   item, 
@@ -31,8 +32,7 @@ export default function VideoItem({
 
   // Compute loading states based on activeIndex passed from parent
   const isCurrentlyActive = index === activeIndex;
-  const isWithinPreloadRange = Math.abs(index - activeIndex) <= 1;
-  const isWithinCacheRange = Math.abs(index - activeIndex) <= 2;
+  const shouldLoad = Math.abs(index - activeIndex) <= 1;
 
   // Set up Intersection Observer to handle active play state callback to parent
   useEffect(() => {
@@ -57,24 +57,26 @@ export default function VideoItem({
     };
   }, [index, onActive]);
 
-  // 1. Manage HLS/Video Source Initialization & Destruction (Cache Range)
+  // 1. Manage HLS/Video Source Loading & Destruction
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const isHls = item.videoUrl.endsWith('.m3u8');
-
-    if (!isWithinCacheRange) {
-      // Out of cache range: completely destroy HLS and clear source to free memory/decoder
+    if (!shouldLoad) {
+      // Unload completely when out of range to free memory, bandwidth, and decoder slots
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
       }
-      video.src = '';
+      video.removeAttribute('src');
+      video.load(); // Forces browser to abort active loading and clear buffer
+      setIsPlaying(false);
+      setProgress(0);
       return;
     }
 
-    // Within cache range but HLS not initialized yet: initialize it
+    // Initialize source if not loaded
+    const isHls = item.videoUrl.endsWith('.m3u8');
     if (!video.src && !hlsRef.current) {
       if (isHls) {
         if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -82,47 +84,38 @@ export default function VideoItem({
           video.src = item.videoUrl;
         } else {
           // Fallback to hls.js (Chrome/Firefox/Android)
-          import('hls.js').then((HlsModule) => {
-            const Hls = HlsModule.default;
-            if (Hls.isSupported()) {
-              const hls = new Hls({
-                maxMaxBufferLength: 10, // Max buffer size in seconds
-                enableWorker: true,
-                lowLatencyMode: true,
-              });
-              hlsRef.current = hls;
-              hls.loadSource(item.videoUrl);
-              hls.attachMedia(video);
+          if (Hls.isSupported()) {
+            const hls = new Hls({
+              maxMaxBufferLength: 10, // Max buffer size in seconds
+              enableWorker: true,
+              lowLatencyMode: true,
+            });
+            hlsRef.current = hls;
+            hls.loadSource(item.videoUrl);
+            hls.attachMedia(video);
 
-              hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                if (isCurrentlyActive) {
-                  video.play()
-                    .then(() => setIsPlaying(true))
-                    .catch((err) => console.log('Autoplay play error:', err));
+            hls.on(Hls.Events.ERROR, (event, data) => {
+              if (data.fatal) {
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    console.warn('HLS Network error, trying to recover...', data);
+                    hls.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                    console.warn('HLS Media error, trying to recover...', data);
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    console.error('Fatal HLS error, destroying...', data);
+                    hls.destroy();
+                    hlsRef.current = null;
+                    break;
                 }
-              });
-
-              hls.on(Hls.Events.ERROR, (event, data) => {
-                if (data.fatal) {
-                  switch (data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                      console.warn('HLS Network error, trying to recover...', data);
-                      hls.startLoad();
-                      break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                      console.warn('HLS Media error, trying to recover...', data);
-                      hls.recoverMediaError();
-                      break;
-                    default:
-                      console.error('Fatal HLS error, destroying...', data);
-                      hls.destroy();
-                      hlsRef.current = null;
-                      break;
-                  }
-                }
-              });
-            }
-          });
+              }
+            });
+          } else {
+            console.error('HLS is not supported in this browser.');
+          }
         }
       } else {
         // Normal MP4 video
@@ -137,42 +130,33 @@ export default function VideoItem({
         hlsRef.current = null;
       }
     };
-  }, [item.videoUrl, isWithinCacheRange]);
+  }, [item.videoUrl, shouldLoad]);
 
-  // 2. Control segment downloading (startLoad / stopLoad) based on Preload Range
-  useEffect(() => {
-    if (hlsRef.current) {
-      if (isWithinPreloadRange) {
-        hlsRef.current.startLoad();
-      } else {
-        hlsRef.current.stopLoad();
-      }
-    }
-  }, [isWithinPreloadRange]);
-
-  // 3. Control Video Playback (Play / Pause) based on active state
+  // 2. Control Video Playback (Play / Pause) based on active state
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !isWithinCacheRange) return;
+    if (!video || !shouldLoad) return;
 
     if (isCurrentlyActive) {
-      const isHls = item.videoUrl.endsWith('.m3u8');
-      const isNativeHls = video.canPlayType('application/vnd.apple.mpegurl');
-      
-      // If we are using hls.js, play is triggered on MANIFEST_PARSED when it loads.
-      // If it's already loaded/attached or if it's native/MP4, we can play immediately.
-      if (!isHls || isNativeHls || (hlsRef.current && hlsRef.current.media)) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              setIsPlaying(true);
-            })
-            .catch((error) => {
-              console.log("Autoplay was prevented:", error);
-              setIsPlaying(false);
-            });
-        }
+      const startPlayback = () => {
+        video.play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((error) => {
+            console.log("Autoplay was prevented:", error);
+            setIsPlaying(false);
+          });
+      };
+
+      // Play immediately if metadata is loaded and ready, otherwise wait for canplay
+      if (video.readyState >= 3) {
+        startPlayback();
+      } else {
+        video.addEventListener('canplay', startPlayback);
+        return () => {
+          video.removeEventListener('canplay', startPlayback);
+        };
       }
     } else {
       video.pause();
@@ -184,7 +168,7 @@ export default function VideoItem({
       setIsPlaying(false);
       setProgress(0);
     }
-  }, [isCurrentlyActive, isWithinCacheRange, item.videoUrl]);
+  }, [isCurrentlyActive, shouldLoad]);
 
   // Update progress bar
   const handleTimeUpdate = () => {
