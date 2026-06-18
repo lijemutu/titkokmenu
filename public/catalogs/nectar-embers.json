@@ -1,0 +1,56 @@
+{
+  "shopName": "Nectar & Embers",
+  "shopSlug": "nectar-embers",
+  "whatsappNumber": "",
+  "whatsappTemplate": "¡Hola! Estoy interesado en {itemName} (precio: ${price}) de Nectar & Embers. ¿Tienen disponibles para ordenar hoy?",
+  "socialUrl": "https://www.instagram.com/nectar_embers/",
+  "theme": {
+    "primaryColor": "#e28743",
+    "accentColor": "#763626",
+    "textColor": "#ffffff"
+  },
+  "items": [
+    {
+      "id": "1",
+      "name": "Experiencia Nectar & Embers",
+      "price": 0,
+      "description": "Una vista de la atmósfera de Nectar & Embers, donde la calidez del fuego de leña y la coctelería de autor se unen.",
+      "videoUrl": "/videos/a-cinematic-wide-angle-interi/index.m3u8"
+    },
+    {
+      "id": "2",
+      "name": "Sliders de Pork Belly Crujiente",
+      "price": 260,
+      "description": "Tres mini hamburguesas de panceta de cerdo braseada con piel ultra crujiente, col morada encurtida, rodajas de jalapeño fresco y un glaseado sedoso de bourbon artesanal.",
+      "videoUrl": "/videos/now-this-eye-level-macro-food/index.m3u8"
+    },
+    {
+      "id": "3",
+      "name": "Burrata Asada con Tomates Heirloom",
+      "price": 290,
+      "description": "Bola de queso burrata cremoso sobre una cama de tomates cherry heirloom rostizados al fuego, aderezado con pesto de albahaca fresca, piñones tostados y reducción de balsámico envejecido.",
+      "videoUrl": "/videos/now-this-overhead-flat-lay-sh/index.m3u8"
+    },
+    {
+      "id": "4",
+      "name": "Mezcal Old Fashioned Ahumado",
+      "price": 195,
+      "description": "Coctel de mezcal artesanal ahumado con un toque de jarabe de agave y amargos de angostura, servido con un bloque de hielo cristalino y una rama de romero encendida en la mesa.",
+      "videoUrl": "/videos/now-this-low-angle-macro-shot/index.m3u8"
+    },
+    {
+      "id": "5",
+      "name": "Sour de Ginebra con Hibisco y Rosas",
+      "price": 180,
+      "description": "Ginebra infusionada con flores de hibisco y jarabe de rosas orgánicas, agitada vigorosamente con clara de huevo para una espuma densa y coronada con pétalos de rosa secos.",
+      "videoUrl": "/videos/close-up-shot-of-a-chilled-cou/index.m3u8"
+    },
+    {
+      "id": "6",
+      "name": "Carajillo con Especias",
+      "price": 170,
+      "description": "Digestivo de espresso caliente recién extraído sobre una base dorada de Licor 43 helado, aromatizado con canela rallada y una estrella de anís estrellado flotante.",
+      "videoUrl": "/videos/now-this-side-view-close-up-s/index.m3u8"
+    }
+  ]
+}

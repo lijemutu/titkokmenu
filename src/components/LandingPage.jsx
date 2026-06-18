@@ -82,7 +82,20 @@ export default function LandingPage({ onNavigate }) {
         
         <div className="demo-cards-container">
         
-          {/* Card 3: Underprice */}
+          {/* Card 1: Nectar & Embers */}
+          <div 
+            className="demo-card nectar-embers" 
+            onClick={() => onNavigate('nectar-embers')}
+          >
+            <div className="card-icon">🍹</div>
+            <h3 className="card-title">Nectar & Embers</h3>
+            <p className="card-desc">
+              Bar y restaurante rústico-moderno. Cortes al fuego de leña y coctelería de autor premium en video vertical.
+            </p>
+            <button className="card-btn">Ver Catálogo</button>
+          </div>
+        
+          {/* Card 2: Underprice */}
           <div 
             className="demo-card underprice" 
             onClick={() => onNavigate('underprice')}
