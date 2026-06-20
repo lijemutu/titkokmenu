@@ -1,0 +1,70 @@
+{
+  "shopName": "Sweet Flores",
+  "shopSlug": "sweet-flores",
+  "whatsappNumber": "7225859367",
+  "whatsappTemplate": "¡Hola, Susi! 👋 Estoy interesado en {itemName} (precio: ${price}) de Sweet Flores. ¿Está disponible?",
+  "socialUrl": "https://www.instagram.com/sweet_flores/",
+  "theme": {
+    "primaryColor": "#ec4899",
+    "accentColor": "#f43f5e",
+    "textColor": "#ffffff"
+  },
+  "items": [
+    {
+      "id": "1",
+      "name": "Pastel Representativo para Eventos",
+      "price": 720,
+      "description": "Creado para destacar en los momentos más memorables de una celebración. Incluye una porción real para el corte ceremonial y una estructura decorativa personalizada que aporta presencia, elegancia y un escenario perfecto para las fotografías. Ideal para bodas, XV años, aniversarios y otros eventos especiales.",
+      "videoUrl": "/videos/pastel-representativo/index.m3u8"
+    },
+    {
+      "id": "2",
+      "name": "Pastel Floral Artesanal",
+      "price": 650,
+      "description": "Decorado con flores de fondant modeladas a mano y acabados cuidadosamente trabajados, cada diseño se personaliza para acompañar celebraciones significativas. Una opción elegante para bodas, aniversarios y ocasiones donde cada detalle importa.",
+      "videoUrl": "/videos/pastel-floral/index.m3u8"
+    },
+    {
+      "id": "3",
+      "name": "Pastel de Chocolate Semiamargo",
+      "price": 180,
+      "description": "Bizcocho suave de mantequilla combinado con ganache de chocolate semiamargo y una cobertura de virutas de chocolate cuidadosamente dispuestas. Una opción atemporal que puede elaborarse en distintos tamaños para compartir o celebrar a cualquier escala.",
+      "videoUrl": "/videos/chocolate-semiamargo/index.m3u8"
+    },
+    {
+      "id": "4",
+      "name": "Pastel de Zanahoria con Crema de Queso",
+      "price": 420,
+      "description": "Preparado con zanahoria fresca, nuez y especias aromáticas, coronado con crema de queso de textura suave y acabado delicado. Una combinación clásica que destaca por su equilibrio de sabores y su textura húmeda.",
+      "videoUrl": "/videos/pastel-zanahoria/index.m3u8"
+    },
+    {
+      "id": "5",
+      "name": "Pastel de Cupcakes Personalizado",
+      "price": 380,
+      "description": "Cupcakes individuales organizados y decorados para formar una composición única. Cada diseño se adapta a la temática de tu elección, ofreciendo una opción creativa, fácil de servir y perfecta para celebraciones de cualquier tamaño.",
+      "videoUrl": "/videos/pastel-cupcakes/index.m3u8"
+    },
+    {
+      "id": "6",
+      "name": "Pastel Individual Temático",
+      "price": 95,
+      "description": "Pequeño en tamaño, único en diseño. Personalizable en prácticamente cualquier temática, con decoraciones elaboradas a medida y detalles cuidadosamente trabajados para hacer de cada pastel una pieza especial.",
+      "videoUrl": "/videos/individual-tematico/index.m3u8"
+    },
+    {
+      "id": "7",
+      "name": "Galletas Decoradas Personalizadas",
+      "price": 150,
+      "description": "Galletas artesanales decoradas a mano con royal icing. Cada colección se diseña especialmente para la ocasión, adaptando colores, formas y detalles para crear piezas únicas. Desde un pequeño obsequio hasta eventos corporativos, cada pedido se desarrolla a medida.",
+      "videoUrl": "/videos/galletas-decoradas/index.m3u8"
+    },
+    {
+      "id": "8",
+      "name": "Galletas de Mantequilla Tipo Pastiseta",
+      "price": 120,
+      "description": "Preparadas con ingredientes seleccionados y horneadas cuidadosamente para lograr una textura ligera y un sabor clásico. Disponibles por kilo, son una opción versátil para obsequios, mesas de café y reuniones especiales.",
+      "videoUrl": "/videos/galletas-mantequilla/index.m3u8"
+    }
+  ]
+}

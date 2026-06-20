@@ -74,9 +74,11 @@ Los celulares modernos graban videos muy pesados. Para evitar la pérdida de cal
    sudo apt update && sudo apt install -y ffmpeg
    ```
 2. Crea una carpeta llamada `raw_videos` en la raíz del proyecto y copia tus videos pesados ahí. (Si no existe, el script también puede procesar archivos directamente en `public/videos/` como respaldo).
-3. Ejecuta el segmentador:
+3. Ejecuta el segmentador (puedes agregar `--no-audio` o `--remove-audio` si deseas remover el sonido de los videos):
    ```bash
    node scripts/chunk_videos.js
+   # o para procesar sin sonido:
+   node scripts/chunk_videos.js --no-audio
    ```
 4. Los videos se procesarán, se guardará el playlist `index.m3u8` y los fragmentos `.ts` en `public/videos/<nombre-video>/`, y las referencias en los catálogos en `public/catalogs/` se actualizarán automáticamente.
 
@@ -121,10 +123,24 @@ Copia y pega estos comandos directamente en tu consola según lo que necesites h
     npm run dev -- --host
     ```
 
+### 🎬 Comprimir Videos (Optimización de Tamaño)
+*   **Comprimir manteniendo sonido**:
+    ```bash
+    node scripts/compress_videos.js
+    ```
+*   **Comprimir removiendo sonido**:
+    ```bash
+    node scripts/compress_videos.js --no-audio
+    ```
+
 ### 🎬 Segmentar Videos en Formato HLS
-*   **Procesar carpeta `/raw_videos/` (o respaldo de `/public/videos/`)**:
+*   **Procesar carpeta `/raw_videos/` (o respaldo de `/public/videos/`) manteniendo sonido**:
     ```bash
     node scripts/chunk_videos.js
+    ```
+*   **Procesar removiendo sonido**:
+    ```bash
+    node scripts/chunk_videos.js --no-audio
     ```
 
 ### 🖨️ Generar Códigos QR (Modo Rápido / No Interactivo)

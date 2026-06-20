@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "compress": "node scripts/compress_videos.js",
+    "compress:mute": "node scripts/compress_videos.js --no-audio",
+    "chunk": "node scripts/chunk_videos.js",
+    "chunk:mute": "node scripts/chunk_videos.js --no-audio"
   },
   "dependencies": {
     "hls.js": "^1.6.16",

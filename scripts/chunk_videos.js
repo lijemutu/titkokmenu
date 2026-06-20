@@ -1,3 +1,4 @@
+/* global process */
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
@@ -13,7 +14,7 @@ const catalogsDir = path.join(__dirname, '../public/catalogs');
 // Verify FFmpeg is installed
 try {
   execSync('ffmpeg -version', { stdio: 'ignore' });
-} catch (e) {
+} catch {
   console.error('❌ Error: FFmpeg is not installed on this system.');
   console.error('Please install it before running this script:');
   console.error('👉 sudo apt update && sudo apt install -y ffmpeg');
@@ -47,13 +48,20 @@ if (videoFiles.length === 0) {
   }
 }
 
+const removeAudio = process.argv.includes('--no-audio') || process.argv.includes('--remove-audio');
+
 if (videoFiles.length === 0) {
   console.log('❌ No video files found to process.');
   console.log('👉 Please create a "raw_videos/" directory at the root and place your MP4 videos there, or place them in "public/videos/".');
   process.exit(0);
 }
 
-console.log(`🚀 Found ${videoFiles.length} video(s) to process in "${path.relative(process.cwd(), sourceDir)}"\n`);
+console.log(`🚀 Found ${videoFiles.length} video(s) to process in "${path.relative(process.cwd(), sourceDir)}"`);
+if (removeAudio) {
+  console.log('🔇 Audio mode: No audio (sound will be removed from videos).\n');
+} else {
+  console.log('🔊 Audio mode: Keeping audio (you can use --no-audio or --remove-audio to mute).\n');
+}
 
 // Video extensions pattern
 function isVideoFile(filename) {
@@ -98,7 +106,8 @@ videoFiles.forEach((file, index) => {
   // - Format constraints to ensure vertical mobile aspect ratio (720x1280) with black padding if needed
   // - Keyframe alignment at 2s interval: -g 60 -sc_threshold 0 (assuming 30fps)
   // - Segment size: 2 seconds (-hls_time 2) for ultra-snappy TikTok style buffering
-  const ffmpegCommand = `ffmpeg -y -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -crf 20 -preset fast -g 60 -sc_threshold 0 -c:a aac -b:a 128k -hls_time 2 -hls_playlist_type vod -hls_segment_filename "${outputSegmentPattern}" "${outputPlaylistPath}"`;
+  const audioCodec = removeAudio ? '-an' : '-c:a aac -b:a 128k';
+  const ffmpegCommand = `ffmpeg -y -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -crf 20 -preset fast -g 60 -sc_threshold 0 ${audioCodec} -hls_time 2 -hls_playlist_type vod -hls_segment_filename "${outputSegmentPattern}" "${outputPlaylistPath}"`;
 
   try {
     execSync(ffmpegCommand, { stdio: 'inherit' });

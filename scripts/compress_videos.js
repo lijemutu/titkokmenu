@@ -1,3 +1,4 @@
+/* global process */
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
@@ -12,7 +13,7 @@ const outputDir = path.join(__dirname, '../public/videos');
 // Verify FFmpeg is installed
 try {
   execSync('ffmpeg -version', { stdio: 'ignore' });
-} catch (e) {
+} catch {
   console.error('❌ Error: FFmpeg no está instalado en este sistema.');
   console.error('Por favor, instálalo antes de correr este script:');
   console.error('👉 sudo apt update && sudo apt install -y ffmpeg');
@@ -46,7 +47,7 @@ try {
   } else {
     console.log('ℹ️ Codificación por hardware (VAAPI) no disponible. Se utilizará la CPU (libx264).\n');
   }
-} catch (err) {
+} catch {
   console.log('ℹ️ Se utilizará la CPU (libx264) para la codificación.\n');
 }
 
@@ -55,13 +56,20 @@ const videoExtensions = new Set(['.mp4', '.mov', '.avi', '.mkv', '.webm', '.3gp'
 const files = fs.readdirSync(inputDir);
 const videoFiles = files.filter(f => videoExtensions.has(path.extname(f).toLowerCase()));
 
+const removeAudio = process.argv.includes('--no-audio') || process.argv.includes('--remove-audio');
+
 if (videoFiles.length === 0) {
   console.log('ℹ️ No se encontraron videos en la carpeta /raw_videos/');
   console.log('👉 Copia tus videos de celular en /raw_videos/ para comprimirlos.');
   process.exit(0);
 }
 
-console.log(`🚀 Iniciando compresión de ${videoFiles.length} videos...\n`);
+console.log(`🚀 Iniciando compresión de ${videoFiles.length} videos...`);
+if (removeAudio) {
+  console.log('🔇 Modo de audio: Sin sonido (se removerá el audio de los videos).\n');
+} else {
+  console.log('🔊 Modo de audio: Manteniendo sonido (puedes usar --no-audio o --remove-audio para silenciar).\n');
+}
 
 videoFiles.forEach((file, index) => {
   const inputPath = path.join(inputDir, file);
@@ -83,20 +91,12 @@ videoFiles.forEach((file, index) => {
   console.log(`[${index + 1}/${videoFiles.length}] Procesando: "${file}"`);
   console.log(`   ➔ Destino: "public/videos/${outputFile}"`);
 
-  // Build the FFmpeg command
-  let ffmpegCommand = '';
+  const audioCodec = removeAudio ? '-an' : '-c:a aac -b:a 64k';
   
-  if (useGpu) {
-    // Hardware accelerated encoding with VAAPI (AMD GPU)
-    // 1. Initialize hardware device
-    // 2. Standard CPU filters (scale and pad) to fit 720x1280 aspect ratio
-    // 3. Format as nv12 and upload to GPU memory (hwupload)
-    // 4. Encode on GPU using h264_vaapi at 1.0 Mbps
-    ffmpegCommand = `ffmpeg -y -init_hw_device vaapi=gpu:${vaapiDevice} -filter_hw_device gpu -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black,format=nv12,hwupload" -c:v h264_vaapi -b:v 1M -maxrate 1.5M -bufsize 3M -c:a aac -b:a 64k "${outputPath}"`;
-  } else {
-    // Standard software encoding (CPU - libx264)
-    ffmpegCommand = `ffmpeg -y -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf 26 -preset fast -maxrate 1200k -bufsize 2400k -c:a aac -b:a 64k "${outputPath}"`;
-  }
+  // Build the FFmpeg command
+  const ffmpegCommand = useGpu
+    ? `ffmpeg -y -init_hw_device vaapi=gpu:${vaapiDevice} -filter_hw_device gpu -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black,format=nv12,hwupload" -c:v h264_vaapi -b:v 1M -maxrate 1.5M -bufsize 3M ${audioCodec} "${outputPath}"`
+    : `ffmpeg -y -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf 26 -preset fast -maxrate 1200k -bufsize 2400k ${audioCodec} "${outputPath}"`;
 
   try {
     // Run FFmpeg
@@ -114,7 +114,7 @@ videoFiles.forEach((file, index) => {
     // If GPU fails, attempt CPU fallback immediately for this file
     if (useGpu) {
       console.log(`   ⚠️ Reintentando codificación por CPU (libx264) como plan de respaldo...`);
-      const fallbackCommand = `ffmpeg -y -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf 26 -preset fast -maxrate 1200k -bufsize 2400k -c:a aac -b:a 64k "${outputPath}"`;
+      const fallbackCommand = `ffmpeg -y -i "${inputPath}" -vf "scale=w=720:h=1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf 26 -preset fast -maxrate 1200k -bufsize 2400k ${audioCodec} "${outputPath}"`;
       try {
         execSync(fallbackCommand, { stdio: 'inherit' });
         const initialSize = fs.statSync(inputPath).size / (1024 * 1024);

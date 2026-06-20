@@ -249,8 +249,29 @@ export default function VideoItem({
   // WhatsApp link compilation
   const handleCtaClick = () => {
     if (!whatsappNumber) return;
-    let text = whatsappTemplate || "¡Hola! Me interesa {itemName} por ${price}.";
-    text = text.replace('{itemName}', item.name).replace('{price}', item.price);
+    
+    const showPrice = item.price !== undefined && item.price !== null && item.price !== 0 && item.price !== '0' && item.price !== '';
+    const formattedPrice = showPrice
+      ? (typeof item.price === 'number' || !isNaN(item.price) ? `$${item.price}` : item.price)
+      : '';
+
+    let text = whatsappTemplate || (showPrice ? "¡Hola! Me interesa {itemName} por {price}." : "¡Hola! Me interesa {itemName}.");
+    
+    if (showPrice) {
+      text = text
+        .replace('{itemName}', item.name)
+        .replace('{price}', formattedPrice)
+        .replace('${price}', formattedPrice); // handle both {price} and ${price}
+    } else {
+      text = text
+        .replace('{itemName}', item.name)
+        .replace(' (precio: {price})', '')
+        .replace(' (precio: ${price})', '')
+        .replace(' por {price}', '')
+        .replace(' por ${price}', '')
+        .replace('{price}', '')
+        .replace('${price}', '');
+    }
     
     const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
     const waUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
@@ -273,10 +294,20 @@ export default function VideoItem({
 
   const handleShareClick = (e) => {
     e.stopPropagation();
+    
+    const showPrice = item.price !== undefined && item.price !== null && item.price !== 0 && item.price !== '0' && item.price !== '';
+    const formattedPrice = showPrice
+      ? (typeof item.price === 'number' || !isNaN(item.price) ? `$${item.price}` : item.price)
+      : '';
+
+    const shareText = showPrice
+      ? `¡Mira este producto en ${shopName}!: ${item.name} - ${formattedPrice}`
+      : `¡Mira este producto en ${shopName}!: ${item.name}`;
+
     if (navigator.share) {
       navigator.share({
         title: item.name,
-        text: `¡Mira este producto en ${shopName}!: ${item.name} - $${item.price}`,
+        text: shareText,
         url: window.location.href,
       }).catch(err => console.log(err));
     } else {
@@ -425,7 +456,11 @@ export default function VideoItem({
           <div className="product-info">
             <div className="product-name-price">
               <h2 className="product-name">{item.name}</h2>
-              <span className="product-price">${item.price}</span>
+              {item.price !== undefined && item.price !== null && item.price !== 0 && item.price !== '0' && item.price !== '' && (
+                <span className="product-price">
+                  {typeof item.price === 'number' || !isNaN(item.price) ? `$${item.price}` : item.price}
+                </span>
+              )}
             </div>
             <p className="product-description">{item.description}</p>
           </div>

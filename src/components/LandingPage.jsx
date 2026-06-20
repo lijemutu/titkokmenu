@@ -107,6 +107,19 @@ export default function LandingPage({ onNavigate }) {
             </p>
             <button className="card-btn">Ver Catálogo</button>
           </div>
+
+          {/* Card 3: Sweet Flores */}
+          <div 
+            className="demo-card sweet-flores" 
+            onClick={() => onNavigate('sweet-flores')}
+          >
+            <div className="card-icon">🍰</div>
+            <h3 className="card-title">Sweet Flores</h3>
+            <p className="card-desc">
+              Pastelería artesanal de Susi. Hermosos pasteles florales, galletas decoradas y repostería gourmet real en video vertical.
+            </p>
+            <button className="card-btn">Ver Catálogo</button>
+          </div>
         </div>
       </section>
 
