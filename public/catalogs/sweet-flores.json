@@ -1,9 +1,9 @@
 {
-  "shopName": "Sweet Flores",
+  "shopName": "SuuEat",
   "shopSlug": "sweet-flores",
   "whatsappNumber": "7225859367",
   "whatsappTemplate": "¡Hola, Susi! 👋 Estoy interesado en {itemName} (precio: ${price}) de Sweet Flores. ¿Está disponible?",
-  "socialUrl": "https://www.instagram.com/sweet_flores/",
+  "socialUrl": "https://www.instagram.com/suu.eat/",
   "theme": {
     "primaryColor": "#ec4899",
     "accentColor": "#f43f5e",
